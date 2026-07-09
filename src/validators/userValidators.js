@@ -5,7 +5,12 @@ function validateCreateUser(data) {
   const today = new Date();
 
   if (typeof birth_date !== "string" || birth_date.trim() === "") {
-    return validationError("birth_date", "Data de nascimento inválida");
+    return createError(
+      400,
+      "Dado inválido",
+      "birth_date",
+      "Data de nascimento inválida",
+    );
   }
 
   const birthDate = new Date(birth_date);
@@ -17,7 +22,12 @@ function validateCreateUser(data) {
     (monthDiff === 0 && today.getDate() >= birthDate.getDate());
 
   if (Number.isNaN(birthDate.getTime())) {
-    return validationError("birth_date", "Data de Nascimento não válida");
+    return createError(
+      400,
+      "Dado inválido",
+      "birth_date",
+      "Data de Nascimento não válida",
+    );
   }
 
   if (!hasBirthdayPassed) {
@@ -25,42 +35,50 @@ function validateCreateUser(data) {
   }
 
   if (age < 18) {
-    return validationError(
+    return createError(
+      400,
+      "Dado inválido",
       "birth_date",
       "Usuário deve ter pelo menos 18 anos.",
     );
   }
 
   if (typeof name !== "string" || name.trim() === "") {
-    return validationError("name", "Nome não é válido");
+    return createError(400, "Dado inválido", "name", "Nome não é válido");
   }
   if (name.trim().length < 3) {
-    return validationError("name", "Nome deve ter 3 ou mais caracteres");
+    return createError(
+      400,
+      "Dado inválido",
+      "name",
+      "Nome deve ter 3 ou mais caracteres",
+    );
   }
 
   if (typeof password !== "string" || password.trim().length < 8) {
-    return validationError("password", "Senha não é válida");
+    return createError(400, "Dado inválido", "password", "Senha não é válida");
   }
 
   if (typeof email !== "string" || email.trim() === "") {
-    return validationError("email", "Email não é valido");
+    return createError(400, "Dado inválido", "email", "Email não é valido");
   }
 
   if (!emailRegex.test(email.trim())) {
-    return validationError("email", "Email não é válido");
+    return createError(400, "Dado inválido", "email", "Email não é válido");
   }
 
   return null;
 }
 
-function validationError(field, message) {
+function createError(status, message, field, detail) {
   return {
-    message: "Dado inválido",
+    status,
+    message,
     error: {
       field,
-      message,
+      detail,
     },
   };
 }
 
-export { validateCreateUser, validationError };
+export { validateCreateUser, createError };

@@ -1,6 +1,6 @@
 import {
   validateCreateUser,
-  validationError,
+  createError,
 } from "../validators/userValidators.js";
 import {
   findByEmail,
@@ -17,7 +17,12 @@ async function createUser(data) {
   const user = await findByEmail(data.email);
 
   if (user) {
-    throw validationError("email", "Email já cadastrado");
+    throw createError(
+      409,
+      "Email já cadastrado",
+      "email",
+      "Email já cadastrado",
+    );
   }
 
   const newUser = await createUserRepository(data);
