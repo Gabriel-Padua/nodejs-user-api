@@ -1,3 +1,5 @@
+import { validate as isUUID } from "uuid";
+
 function validateCreateUser(data) {
   const { name, password, email, birth_date } = data;
 
@@ -81,4 +83,12 @@ function createError(status, message, field, detail) {
   };
 }
 
-export { validateCreateUser, createError };
+function validateUUID(id) {
+  if (!isUUID(id)) {
+    return createError(400, "UUID inválido", "uuid", "UUID não válido");
+  }
+
+  return null;
+}
+
+export { validateCreateUser, createError, validateUUID };

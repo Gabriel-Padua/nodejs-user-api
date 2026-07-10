@@ -1,11 +1,40 @@
 import {
   validateCreateUser,
   createError,
+  validateUUID,
 } from "../validators/userValidators.js";
 import {
   findByEmail,
   createUser as createUserRepository,
+  findAllUsers,
+  findById,
 } from "../repositories/userRepository.js";
+
+async function getUsers() {
+  const users = await findAllUsers();
+
+  return users;
+}
+
+async function getUserById(id) {
+  const erro = validateUUID(id);
+  if (erro) {
+    throw erro;
+  }
+
+  const user = await findById(id);
+
+  if (!user) {
+    throw createError(
+      404,
+      "Usuário não encontrado",
+      "id",
+      "Nenhum usuário encontrado com esse ID",
+    );
+  }
+
+  return user;
+}
 
 async function createUser(data) {
   const error = validateCreateUser(data);
@@ -32,4 +61,4 @@ async function createUser(data) {
   return newUser;
 }
 
-export { createUser };
+export { createUser, getUserById, getUsers };
