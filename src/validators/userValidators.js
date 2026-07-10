@@ -4,46 +4,6 @@ function validateCreateUser(data) {
   const { name, password, email, birth_date } = data;
 
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const today = new Date();
-
-  if (typeof birth_date !== "string" || birth_date.trim() === "") {
-    return createError(
-      400,
-      "Dado inválido",
-      "birth_date",
-      "Data de nascimento inválida",
-    );
-  }
-
-  const birthDate = new Date(birth_date);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-
-  const hasBirthdayPassed =
-    monthDiff > 0 ||
-    (monthDiff === 0 && today.getDate() >= birthDate.getDate());
-
-  if (Number.isNaN(birthDate.getTime())) {
-    return createError(
-      400,
-      "Dado inválido",
-      "birth_date",
-      "Data de Nascimento não válida",
-    );
-  }
-
-  if (!hasBirthdayPassed) {
-    age--;
-  }
-
-  if (age < 18) {
-    return createError(
-      400,
-      "Dado inválido",
-      "birth_date",
-      "Usuário deve ter pelo menos 18 anos.",
-    );
-  }
 
   if (typeof name !== "string" || name.trim() === "") {
     return createError(400, "Dado inválido", "name", "Nome não é válido");
@@ -69,6 +29,85 @@ function validateCreateUser(data) {
     return createError(400, "Dado inválido", "email", "Email não é válido");
   }
 
+  const birthDateError = validateBirthDate(birth_date);
+  if (birthDateError) {
+    return birthDateError;
+  }
+
+  return null;
+}
+
+function validateUpdateUser(data) {
+  if ("name" in data) {
+    if (typeof data.name !== "string" || data.name.trim().length < 3) {
+      return createError(400, "Dado inválido", "name", "Nome inválido");
+    }
+  }
+
+  if ("email" in data) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (typeof data.email !== "string" || !emailRegex.test(data.email.trim())) {
+      return createError(400, "Dado inválido", "email", "Email inválido");
+    }
+  }
+
+  if ("password" in data) {
+    if (typeof data.password !== "string" || data.password.trim().length < 8) {
+      return createError(400, "Dado inválido", "password", "Senha inválida");
+    }
+  }
+  if ("birth_date" in data) {
+    const birthDateError = validateBirthDate(data.birth_date);
+    if (birthDateError) {
+      return birthDateError;
+    }
+  }
+
+  return null;
+}
+
+function validateBirthDate(birth_date) {
+  if (typeof birth_date !== "string" || birth_date.trim() === "") {
+    return createError(
+      400,
+      "Dado inválido",
+      "birth_date",
+      "Data de nascimento inválida",
+    );
+  }
+
+  const birthDate = new Date(birth_date);
+  if (Number.isNaN(birthDate.getTime())) {
+    return createError(
+      400,
+      "Dado inválido",
+      "birth_date",
+      "Data de Nascimento não válida",
+    );
+  }
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  const hasBirthdayPassed =
+    monthDiff > 0 ||
+    (monthDiff === 0 && today.getDate() >= birthDate.getDate());
+
+  if (!hasBirthdayPassed) {
+    age--;
+  }
+
+  if (age < 18) {
+    return createError(
+      400,
+      "Dado inválido",
+      "birth_date",
+      "Usuário deve ter pelo menos 18 anos.",
+    );
+  }
+
   return null;
 }
 
@@ -91,4 +130,4 @@ function validateUUID(id) {
   return null;
 }
 
-export { validateCreateUser, createError, validateUUID };
+export { validateCreateUser, createError, validateUUID, validateUpdateUser };

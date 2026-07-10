@@ -44,4 +44,29 @@ async function createUser(data) {
   return rows[0] || null;
 }
 
-export { createUser, findAllUsers, findById, findByEmail };
+async function updateUser(id, data) {
+  const fields = [];
+  const values = [];
+
+  let index = 1;
+
+  for (const [key, value] of Object.entries(data)) {
+    fields.push(`${key} = $${index}`);
+    values.push(typeof value === "string" ? value.trim() : value);
+    index++;
+  }
+
+  values.push(id);
+
+  const query = `
+    UPDATE users
+    SET ${fields.join(", ")}
+    WHERE id = $${index}
+    RETURNING *;
+  `;
+
+  const { rows } = await pool.query(query, values);
+
+  return rows[0] ?? null;
+}
+export { createUser, findAllUsers, findById, findByEmail, updateUser };

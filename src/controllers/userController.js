@@ -2,6 +2,7 @@ import {
   createUser as createUserService,
   getUsers as getUsersService,
   getUserById as getUserByIdService,
+  updateUser as updateUserService,
 } from "../services/userService";
 
 async function createUser(req, res) {
@@ -10,6 +11,18 @@ async function createUser(req, res) {
     return res
       .status(201)
       .json({ message: "Usuário criado com sucesso!", newUser });
+  } catch (error) {
+    return res.status(error.status ?? 500).json(error);
+  }
+}
+
+async function updateUser(req, res) {
+  try {
+    const { id } = req.params;
+    const user = await updateUserService(id);
+    return res
+      .status(200)
+      .json({ message: `Usuário atualizado com sucesso`, user });
   } catch (error) {
     return res.status(error.status ?? 500).json(error);
   }
@@ -34,4 +47,4 @@ async function getUserById(req, res) {
   }
 }
 
-export { createUser, getUsers, getUserById };
+export { createUser, getUsers, getUserById, updateUser };

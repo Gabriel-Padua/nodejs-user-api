@@ -8,12 +8,81 @@ import {
   createUser as createUserRepository,
   findAllUsers,
   findById,
+  updateUser as updateUserRepository,
 } from "../repositories/userRepository.js";
 
 async function getUsers() {
   const users = await findAllUsers();
 
   return users;
+}
+
+async function updateUser(id, data) {
+  const user = await findById(id);
+
+  if (!user) {
+    throw createError(
+      404,
+      "Usuário não encontrado",
+      "id",
+      "Nenhum usuário encontrado com esse ID",
+    );
+  }
+
+  const allowedFields = [
+    "name",
+    "email",
+    "password",
+    "birth_date",
+    "is_active",
+  ];
+
+  const filteredData = {};
+
+  for (const key of allowedFields) {
+    if (data[key] !== undefined) {
+      filteredData[key] = data[key];
+    }
+  }
+
+  if (Object.keys(filteredData).length === 0) {
+    throw createError(
+      400,
+      "Dados inválidos",
+      "body",
+      "Nenhum campo enviado para atualização",
+    );
+  }
+
+  const mergedUser = {
+    ...user,
+    ...filteredData,
+  };
+
+  const error = validateUpdateUser(mergedUser);
+
+  if (error) {
+    throw error;
+  }
+
+  if (filteredData.email && filteredData.email !== user.email) {
+    const emailExists = await findByEmail(filteredData.email);
+
+    if (emailExists) {
+      throw createError(
+        409,
+        "Email já cadastrado",
+        "email",
+        "Já existe um usuário com esse email",
+      );
+    }
+  }
+
+  const updatedUser = await updateUserRepository(id, filteredData);
+
+  delete updatedUser.password;
+
+  return updatedUser;
 }
 
 async function getUserById(id) {
