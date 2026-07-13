@@ -60,7 +60,7 @@ async function updateUser(id, data) {
 
   const query = `
     UPDATE users
-    SET ${fields.join(", ")}
+    SET ${fields.join(", ")}, updated_at = NOW()
     WHERE id = $${index}
     RETURNING *;
   `;
@@ -69,4 +69,23 @@ async function updateUser(id, data) {
 
   return rows[0] ?? null;
 }
-export { createUser, findAllUsers, findById, findByEmail, updateUser };
+
+async function deleteUser(id) {
+  const { rows } = await pool.query(
+    `
+    DELETE FROM users WHERE id = $1 RETURNING *
+    `,
+    [id],
+  );
+
+  return rows[0] ?? null;
+}
+
+export {
+  createUser,
+  findAllUsers,
+  findById,
+  findByEmail,
+  updateUser,
+  deleteUser,
+};

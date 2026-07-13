@@ -3,7 +3,8 @@ import {
   getUsers as getUsersService,
   getUserById as getUserByIdService,
   updateUser as updateUserService,
-} from "../services/userService";
+  deleteUser as deleteUserService,
+} from "../services/userService.js";
 
 async function createUser(req, res) {
   try {
@@ -47,4 +48,17 @@ async function getUserById(req, res) {
   }
 }
 
-export { createUser, getUsers, getUserById, updateUser };
+async function deleteUser(req, res) {
+  const { id } = req.params;
+
+  try {
+    const result = await deleteUserService(id);
+    return res
+      .status(200)
+      .json({ message: "Usuário deletado com sucesso!", result });
+  } catch (error) {
+    return res.status(error.status ?? 500).json(error);
+  }
+}
+
+export { createUser, getUsers, getUserById, updateUser, deleteUser };

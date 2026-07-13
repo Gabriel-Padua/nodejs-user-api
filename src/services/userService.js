@@ -2,12 +2,14 @@ import {
   validateCreateUser,
   createError,
   validateUUID,
+  validateUpdateUser,
 } from "../validators/userValidators.js";
 import {
   findByEmail,
   createUser as createUserRepository,
   findAllUsers,
   findById,
+  deleteUser as deleteUserRepository,
   updateUser as updateUserRepository,
 } from "../repositories/userRepository.js";
 
@@ -18,6 +20,12 @@ async function getUsers() {
 }
 
 async function updateUser(id, data) {
+  const erro = validateUUID(id);
+
+  if (erro) {
+    throw erro;
+  }
+
   const user = await findById(id);
 
   if (!user) {
@@ -130,4 +138,27 @@ async function createUser(data) {
   return newUser;
 }
 
-export { createUser, getUserById, getUsers };
+async function deleteUser(id) {
+  const erro = validateUUID(id);
+
+  if (erro) {
+    throw erro;
+  }
+
+  const user = await getUserById(id);
+
+  if (!user) {
+    throw createError(
+      404,
+      "Usuário não encontrado",
+      "id",
+      "Nenhum usuário encontrado com esse ID",
+    );
+  }
+
+  const deletedUser = await deleteUserRepository(id);
+
+  return deletedUser;
+}
+
+export { createUser, getUserById, getUsers, updateUser, deleteUser };
