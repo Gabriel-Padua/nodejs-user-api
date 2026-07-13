@@ -1,7 +1,20 @@
-async function findAllUsers() {
-  const { rows } = await pool.query(`
-    SELECT * FROM users;
-    `);
+import pool from "../database/pool.js";
+
+async function findAllUsers(limit = 10, isActive = null) {
+  const values = [];
+  let queryText = `SELECT * FROM users`;
+  let counter = 1;
+
+  if (isActive !== null) {
+    queryText += ` WHERE is_active = $${counter}`;
+    values.push(isActive);
+    counter++;
+  }
+
+  queryText += ` LIMIT $${counter}`;
+  values.push(limit);
+
+  const { rows } = await pool.query(queryText, values);
 
   return rows;
 }

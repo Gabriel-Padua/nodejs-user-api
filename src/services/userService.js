@@ -13,13 +13,13 @@ import {
   updateUser as updateUserRepository,
 } from "../repositories/userRepository.js";
 
-async function getUsers() {
-  const users = await findAllUsers();
+async function getUsersService(limit, isActive) {
+  const users = await findAllUsers(limit, isActive);
 
   return users;
 }
 
-async function updateUser(id, data) {
+async function updateUserService(id, data = {}) {
   const erro = validateUUID(id);
 
   if (erro) {
@@ -61,17 +61,16 @@ async function updateUser(id, data) {
       "Nenhum campo enviado para atualização",
     );
   }
+  const error = validateUpdateUser(filteredData);
+
+  if (error) {
+    throw error;
+  }
 
   const mergedUser = {
     ...user,
     ...filteredData,
   };
-
-  const error = validateUpdateUser(mergedUser);
-
-  if (error) {
-    throw error;
-  }
 
   if (filteredData.email && filteredData.email !== user.email) {
     const emailExists = await findByEmail(filteredData.email);
@@ -93,7 +92,7 @@ async function updateUser(id, data) {
   return updatedUser;
 }
 
-async function getUserById(id) {
+async function getUserByIdService(id) {
   const erro = validateUUID(id);
   if (erro) {
     throw erro;
@@ -113,7 +112,7 @@ async function getUserById(id) {
   return user;
 }
 
-async function createUser(data) {
+async function createUserService(data) {
   const error = validateCreateUser(data);
 
   if (error) {
@@ -138,14 +137,14 @@ async function createUser(data) {
   return newUser;
 }
 
-async function deleteUser(id) {
+async function deleteUserService(id) {
   const erro = validateUUID(id);
 
   if (erro) {
     throw erro;
   }
 
-  const user = await getUserById(id);
+  const user = await getUserByIdService(id);
 
   if (!user) {
     throw createError(
@@ -158,7 +157,15 @@ async function deleteUser(id) {
 
   const deletedUser = await deleteUserRepository(id);
 
+  delete deletedUser.password;
+
   return deletedUser;
 }
 
-export { createUser, getUserById, getUsers, updateUser, deleteUser };
+export {
+  createUserService,
+  getUserByIdService,
+  getUsersService,
+  updateUserService,
+  deleteUserService,
+};

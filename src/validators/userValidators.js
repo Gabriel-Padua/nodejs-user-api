@@ -44,6 +44,17 @@ function validateUpdateUser(data) {
     }
   }
 
+  if ("is_active" in data) {
+    if (typeof data.is_active !== "boolean") {
+      return createError(
+        400,
+        "Dado inválido",
+        "is_active",
+        "O campo is_active deve ser do tipo booleano (true ou false)",
+      );
+    }
+  }
+
   if ("email" in data) {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
