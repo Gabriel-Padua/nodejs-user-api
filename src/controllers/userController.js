@@ -4,6 +4,7 @@ import {
   getUserByIdService,
   updateUserService,
   deleteUserService,
+  loginUserService,
 } from "../services/userService.js";
 
 async function createUserController(req, res) {
@@ -68,10 +69,23 @@ async function deleteUserController(req, res) {
   }
 }
 
+async function loginUserController(req, res) {
+  const { email, password } = req.body;
+
+  try {
+    const user = await loginUserService({ email, password });
+
+    return res.status(200).json({ message: "Usuário logado!", user });
+  } catch (error) {
+    return res.status(error.status ?? 500).json(error);
+  }
+}
+
 export {
   createUserController,
   getUsersController,
   getUserByIdController,
   updateUserController,
   deleteUserController,
+  loginUserController,
 };

@@ -1,9 +1,8 @@
 import { validate as isUUID } from "uuid";
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 function validateCreateUser(data) {
   const { name, password, email, birth_date } = data;
-
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   if (typeof name !== "string" || name.trim() === "") {
     return createError(400, "Dado inválido", "name", "Nome não é válido");
@@ -25,7 +24,7 @@ function validateCreateUser(data) {
     return createError(400, "Dado inválido", "email", "Email não é valido");
   }
 
-  if (!emailRegex.test(email.trim())) {
+  if (!EMAIL_REGEX.test(email.trim())) {
     return createError(400, "Dado inválido", "email", "Email não é válido");
   }
 
@@ -56,9 +55,10 @@ function validateUpdateUser(data) {
   }
 
   if ("email" in data) {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (typeof data.email !== "string" || !emailRegex.test(data.email.trim())) {
+    if (
+      typeof data.email !== "string" ||
+      !EMAIL_REGEX.test(data.email.trim())
+    ) {
       return createError(400, "Dado inválido", "email", "Email inválido");
     }
   }
@@ -141,4 +141,26 @@ function validateUUID(id) {
   return null;
 }
 
-export { validateCreateUser, createError, validateUUID, validateUpdateUser };
+function validateLogin({ email, password }) {
+  if (typeof email !== "string" || email.trim() === "") {
+    return createError(400, "Dado inválido", "email", "Email não é valido");
+  }
+
+  if (!EMAIL_REGEX.test(email.trim())) {
+    return createError(400, "Dado inválido", "email", "Email não é válido");
+  }
+
+  if (typeof password !== "string" || password.trim().length < 8) {
+    return createError(400, "Dado inválido", "password", "Senha não é válida");
+  }
+
+  return null;
+}
+
+export {
+  validateCreateUser,
+  createError,
+  validateUUID,
+  validateUpdateUser,
+  validateLogin,
+};

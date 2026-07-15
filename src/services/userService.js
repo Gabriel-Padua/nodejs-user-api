@@ -1,8 +1,10 @@
+import bcrypt from "bcrypt";
 import {
   validateCreateUser,
   createError,
   validateUUID,
   validateUpdateUser,
+  validateLogin,
 } from "../validators/userValidators.js";
 import {
   findByEmail,
@@ -92,6 +94,40 @@ async function updateUserService(id, data = {}) {
   return updatedUser;
 }
 
+async function loginUserService({ email, password }) {
+  const erro = validateLogin({ email, password });
+
+  if (erro) {
+    throw erro;
+  }
+
+  const user = await findByEmail(email);
+
+  if (!user) {
+    throw createError(
+      401,
+      "Usuário não autorizado",
+      "user",
+      "Email ou senha inválidos",
+    );
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
+    throw createError(
+      401,
+      "Usuário não autorizado",
+      "user",
+      "Email ou senha não são compativeis",
+    );
+  }
+
+  delete user.password;
+
+  return user;
+}
+
 async function getUserByIdService(id) {
   const erro = validateUUID(id);
   if (erro) {
@@ -130,11 +166,18 @@ async function createUserService(data) {
     );
   }
 
-  const newUser = await createUserRepository(data);
+  const passwordHash = await bcrypt.hash(data.password, 10);
 
-  delete newUser.password;
+  const newUser = {
+    ...data,
+    password: passwordHash,
+  };
 
-  return newUser;
+  const createdUser = await createUserRepository(newUser);
+
+  delete createdUser.password;
+
+  return createdUser;
 }
 
 async function deleteUserService(id) {
