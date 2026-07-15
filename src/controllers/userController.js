@@ -73,9 +73,9 @@ async function loginUserController(req, res) {
   const { email, password } = req.body;
 
   try {
-    const user = await loginUserService({ email, password });
+    const result = await loginUserService({ email, password });
 
-    return res.status(200).json({ message: "Usuário logado!", user });
+    return res.status(200).json({ message: "Usuário logado!", ...result });
   } catch (error) {
     return res.status(error.status ?? 500).json(error);
   }

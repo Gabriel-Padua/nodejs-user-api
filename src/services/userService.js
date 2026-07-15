@@ -1,4 +1,6 @@
+import "dotenv/config";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import {
   validateCreateUser,
   createError,
@@ -124,8 +126,19 @@ async function loginUserService({ email, password }) {
   }
 
   delete user.password;
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" },
+  );
 
-  return user;
+  return {
+    user,
+    token,
+  };
 }
 
 async function getUserByIdService(id) {
@@ -211,4 +224,5 @@ export {
   getUsersService,
   updateUserService,
   deleteUserService,
+  loginUserService,
 };
