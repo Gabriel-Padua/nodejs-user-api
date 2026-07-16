@@ -81,6 +81,11 @@ async function loginUserController(req, res) {
   }
 }
 
+async function getMeController(req, res) {
+  const user = await getUserByIdService(req.user.id);
+  return res.json(user);
+}
+
 export {
   createUserController,
   getUsersController,
@@ -88,4 +93,5 @@ export {
   updateUserController,
   deleteUserController,
   loginUserController,
+  getMeController,
 };

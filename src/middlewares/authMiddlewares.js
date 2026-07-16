@@ -18,8 +18,7 @@ function authenticator(req, res, next) {
   }
 
   const [type, token] = authorization.split(" ");
-  console.log(type);
-  console.log(token);
+
   if (type !== "Bearer" || !token) {
     return res
       .status(401)
