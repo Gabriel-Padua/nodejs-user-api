@@ -1,4 +1,4 @@
-import { createError } from "../validators/userValidators.js";
+import createError from "../utils/createError.js";
 
 function owner(req, res, next) {
   if (req.user.id !== req.params.id) {

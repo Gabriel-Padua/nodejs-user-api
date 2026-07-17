@@ -4,8 +4,9 @@ import {
   getUserByIdService,
   updateUserService,
   deleteUserService,
-  loginUserService,
 } from "../services/userService.js";
+
+import loginUserService from "../services/authService.js";
 
 async function createUserController(req, res) {
   try {

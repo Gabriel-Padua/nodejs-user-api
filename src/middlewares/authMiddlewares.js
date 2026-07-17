@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
-import { createError } from "../validators/userValidators.js";
+import createError from "../utils/createError.js";
+import { verifyToken } from "../helpers/jwt.js";
 
 function authenticator(req, res, next) {
   let { authorization } = req.headers;
-  console.log(req.headers.authorization);
   if (!authorization) {
     return res
       .status(401)
@@ -33,7 +33,7 @@ function authenticator(req, res, next) {
   }
   let payload;
   try {
-    payload = jwt.verify(token, process.env.JWT_SECRET);
+    payload = verifyToken(token);
   } catch (error) {
     return res
       .status(401)

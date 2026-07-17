@@ -1,5 +1,8 @@
-import { validate as isUUID } from "uuid";
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+import validateUUID from "./uuidValidator.js";
+import createError from "../utils/createError.js";
+import emailValidator from "./emailValidator.js";
+import validateBirthDate from "./birthDateValidator.js";
+import passwordValidator from "./passwordValidator.js";
 
 function validateCreateUser(data) {
   const { name, password, email, birth_date } = data;
@@ -16,19 +19,14 @@ function validateCreateUser(data) {
     );
   }
 
-  if (typeof password !== "string" || password.trim().length < 8) {
-    return createError(400, "Dado inválido", "password", "Senha não é válida");
-  }
+  const passwordError = passwordValidator(password);
 
-  if (typeof email !== "string" || email.trim() === "") {
-    return createError(400, "Dado inválido", "email", "Email não é valido");
-  }
-
-  if (!EMAIL_REGEX.test(email.trim())) {
-    return createError(400, "Dado inválido", "email", "Email não é válido");
+  if (passwordError) {
+    return passwordError;
   }
 
   const birthDateError = validateBirthDate(birth_date);
+
   if (birthDateError) {
     return birthDateError;
   }
@@ -55,21 +53,20 @@ function validateUpdateUser(data) {
   }
 
   if ("email" in data) {
-    if (
-      typeof data.email !== "string" ||
-      !EMAIL_REGEX.test(data.email.trim())
-    ) {
-      return createError(400, "Dado inválido", "email", "Email inválido");
+    const passwordError = emailValidator(data.email);
+    if (passwordError) {
+      return passwordError;
     }
   }
 
   if ("password" in data) {
-    if (typeof data.password !== "string" || data.password.trim().length < 8) {
-      return createError(400, "Dado inválido", "password", "Senha inválida");
+    const passwordError = passwordValidator(data.password);
+    if (passwordError) {
+      return passwordError;
     }
   }
   if ("birth_date" in data) {
-    const birthDateError = validateBirthDate(data.birth_date);
+    const birthDateError = validateBirthDate(data.email);
     if (birthDateError) {
       return birthDateError;
     }
@@ -78,89 +75,20 @@ function validateUpdateUser(data) {
   return null;
 }
 
-function validateBirthDate(birth_date) {
-  if (typeof birth_date !== "string" || birth_date.trim() === "") {
-    return createError(
-      400,
-      "Dado inválido",
-      "birth_date",
-      "Data de nascimento inválida",
-    );
-  }
-
-  const birthDate = new Date(birth_date);
-  if (Number.isNaN(birthDate.getTime())) {
-    return createError(
-      400,
-      "Dado inválido",
-      "birth_date",
-      "Data de Nascimento não válida",
-    );
-  }
-
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-
-  const hasBirthdayPassed =
-    monthDiff > 0 ||
-    (monthDiff === 0 && today.getDate() >= birthDate.getDate());
-
-  if (!hasBirthdayPassed) {
-    age--;
-  }
-
-  if (age < 18) {
-    return createError(
-      400,
-      "Dado inválido",
-      "birth_date",
-      "Usuário deve ter pelo menos 18 anos.",
-    );
-  }
-
-  return null;
-}
-
-function createError(status, message, field, detail) {
-  return {
-    status,
-    message,
-    error: {
-      field,
-      detail,
-    },
-  };
-}
-
-function validateUUID(id) {
-  if (!isUUID(id)) {
-    return createError(400, "UUID inválido", "uuid", "UUID não válido");
-  }
-
-  return null;
-}
-
 function validateLogin({ email, password }) {
-  if (typeof email !== "string" || email.trim() === "") {
-    return createError(400, "Dado inválido", "email", "Email não é valido");
+  const emailError = emailValidator(email);
+
+  if (emailError) {
+    return emailError;
   }
 
-  if (!EMAIL_REGEX.test(email.trim())) {
-    return createError(400, "Dado inválido", "email", "Email não é válido");
-  }
+  const passwordError = passwordValidator(password);
 
-  if (typeof password !== "string" || password.trim().length < 8) {
-    return createError(400, "Dado inválido", "password", "Senha não é válida");
+  if (passwordError) {
+    return passwordError;
   }
 
   return null;
 }
 
-export {
-  validateCreateUser,
-  createError,
-  validateUUID,
-  validateUpdateUser,
-  validateLogin,
-};
+export { validateCreateUser, validateUpdateUser, validateLogin };

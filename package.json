@@ -1,16 +1,22 @@
 {
-  "name": "users-api",
+  "name": "nodejs-user-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node server.js",
-    "start:watch": "node --watch src/server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "REST API for user management built with Node.js, Express, PostgreSQL, JWT and bcrypt.",
   "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": ["nodejs",
+    "express",
+    "postgresql",
+    "rest-api",
+    "jwt",
+    "bcrypt",
+    "backend"],
+  "author": "Gabriel Pádua",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",

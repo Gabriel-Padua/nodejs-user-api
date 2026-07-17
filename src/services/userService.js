@@ -1,13 +1,14 @@
 import "dotenv/config";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+
+import createError from "../utils/createError.js";
+import toPublicUser from "../utils/userMapper.js";
+import validateUUID from "../validators/uuidValidator.js";
 import {
   validateCreateUser,
-  createError,
-  validateUUID,
   validateUpdateUser,
   validateLogin,
 } from "../validators/userValidators.js";
+
 import {
   findByEmail,
   createUser as createUserRepository,
@@ -96,51 +97,6 @@ async function updateUserService(id, data = {}) {
   return updatedUser;
 }
 
-async function loginUserService({ email, password }) {
-  const erro = validateLogin({ email, password });
-
-  if (erro) {
-    throw erro;
-  }
-
-  const user = await findByEmail(email);
-
-  if (!user) {
-    throw createError(
-      401,
-      "Usuário não autorizado",
-      "user",
-      "Email ou senha inválidos",
-    );
-  }
-
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-  if (!isPasswordCorrect) {
-    throw createError(
-      401,
-      "Usuário não autorizado",
-      "user",
-      "Email ou senha não são compativeis",
-    );
-  }
-
-  delete user.password;
-  const token = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" },
-  );
-
-  return {
-    user,
-    token,
-  };
-}
-
 async function getUserByIdService(id) {
   const erro = validateUUID(id);
   if (erro) {
@@ -158,15 +114,7 @@ async function getUserByIdService(id) {
     );
   }
 
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    birth_date: user.birth_date,
-    is_active: user.is_active,
-    created_at: user.created_at,
-    updated_at: user.updated_at,
-  };
+  return toPublicUser(user);
 }
 
 async function createUserService(data) {
@@ -232,5 +180,4 @@ export {
   getUsersService,
   updateUserService,
   deleteUserService,
-  loginUserService,
 };
