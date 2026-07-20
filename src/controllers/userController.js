@@ -11,10 +11,10 @@ import loginUserService from "../services/authService.js";
 
 async function createUserController(req, res) {
   try {
-    const newUser = await createUserService(req.body);
+    const user = await createUserService(req.body);
     return res
       .status(201)
-      .json({ message: "Usuário criado com sucesso!", newUser });
+      .json({ message: "Usuário criado com sucesso!", user });
   } catch (error) {
     return res.status(error.status ?? 500).json(error);
   }
@@ -95,7 +95,8 @@ async function getMeController(req, res) {
 
 async function updateUserRoleController(req, res) {
   const { id } = req.params;
-  const { role } = req.user;
+  const { role } = req.body;
+
   try {
     const user = await updateUserRoleService(id, role);
     return res
