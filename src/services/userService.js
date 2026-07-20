@@ -1,5 +1,5 @@
 import "dotenv/config";
-
+import bcrypt from "bcrypt";
 import createError from "../utils/createError.js";
 import toPublicUser from "../utils/userMapper.js";
 import validateUUID from "../validators/uuidValidator.js";
@@ -17,6 +17,7 @@ import {
   deleteUser as deleteUserRepository,
   updateUser as updateUserRepository,
 } from "../repositories/userRepository.js";
+import roleValidator from "../validators/roleValidator.js";
 
 async function getUsersService(limit, isActive) {
   const users = await findAllUsers(limit, isActive);
@@ -144,9 +145,7 @@ async function createUserService(data) {
 
   const createdUser = await createUserRepository(newUser);
 
-  delete createdUser.password;
-
-  return createdUser;
+  return toPublicUser(createdUser);
 }
 
 async function deleteUserService(id) {
@@ -169,9 +168,36 @@ async function deleteUserService(id) {
 
   const deletedUser = await deleteUserRepository(id);
 
-  delete deletedUser.password;
+  return toPublicUser(deletedUser);
+}
 
-  return deletedUser;
+async function updateUserRoleService(id, role) {
+  const erro = validateUUID(id);
+  if (erro) {
+    throw erro;
+  }
+  const error = roleValidator(role);
+
+  if (error) {
+    throw error;
+  }
+
+  const user = await findById(id);
+
+  if (!user) {
+    throw createError(
+      404,
+      "Usuário não encontrado",
+      "id",
+      "Nenhum usuário encontrado com esse ID",
+    );
+  }
+
+  const updatedUser = await updateUserRepository(id, {
+    role,
+  });
+
+  return toPublicUser(updatedUser);
 }
 
 export {
@@ -180,4 +206,5 @@ export {
   getUsersService,
   updateUserService,
   deleteUserService,
+  updateUserRoleService,
 };

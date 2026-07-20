@@ -4,6 +4,7 @@ import {
   getUserByIdService,
   updateUserService,
   deleteUserService,
+  updateUserRoleService,
 } from "../services/userService.js";
 
 import loginUserService from "../services/authService.js";
@@ -83,8 +84,26 @@ async function loginUserController(req, res) {
 }
 
 async function getMeController(req, res) {
-  const user = await getUserByIdService(req.user.id);
-  return res.json(user);
+  const { id } = req.user;
+  try {
+    const user = await getUserByIdService(id);
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(error.status ?? 500).json(error);
+  }
+}
+
+async function updateUserRoleController(req, res) {
+  const { id } = req.params;
+  const { role } = req.user;
+  try {
+    const user = await updateUserRoleService(id, role);
+    return res
+      .status(200)
+      .json({ message: "Role de usuário atualizado com sucesso", user });
+  } catch (error) {
+    return res.status(error.status ?? 500).json(error);
+  }
 }
 
 export {
@@ -92,6 +111,7 @@ export {
   getUsersController,
   getUserByIdController,
   updateUserController,
+  updateUserRoleController,
   deleteUserController,
   loginUserController,
   getMeController,

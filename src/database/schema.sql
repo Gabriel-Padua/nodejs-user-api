@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL,
     password TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-
+    role TEXT NOT NULL DEFAULT 'user',
     birth_date DATE
         CONSTRAINT check_age
         CHECK (

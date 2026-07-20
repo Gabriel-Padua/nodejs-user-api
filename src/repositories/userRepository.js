@@ -53,7 +53,6 @@ async function createUser(data) {
         `,
     [name.trim(), password.trim(), email.trim(), birth_date],
   );
-
   return rows[0] || null;
 }
 
