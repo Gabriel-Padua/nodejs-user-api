@@ -2,7 +2,7 @@ import pool from "../database/pool.js";
 
 async function findAllUsers(limit = 10, isActive = null) {
   const values = [];
-  let queryText = `SELECT id, name, email, birth_date, is_active, created_at, updated_at FROM users`;
+  let queryText = `SELECT id, name, email, role, birth_date, is_active, created_at, updated_at FROM users`;
   let counter = 1;
 
   if (isActive !== null) {
