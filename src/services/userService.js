@@ -14,10 +14,12 @@ import {
   createUser as createUserRepository,
   findAllUsers,
   findById,
+  countAdmins,
   deleteUser as deleteUserRepository,
   updateUser as updateUserRepository,
 } from "../repositories/userRepository.js";
 import roleValidator from "../validators/roleValidator.js";
+import { ROLES } from "../constants/roles.js";
 
 async function getUsersService(limit, isActive) {
   const users = await findAllUsers(limit, isActive);
@@ -176,10 +178,10 @@ async function updateUserRoleService(id, role) {
   if (erro) {
     throw erro;
   }
-  const error = roleValidator(role);
+  const roleError = roleValidator(role);
 
-  if (error) {
-    throw error;
+  if (roleError) {
+    throw roleError;
   }
 
   const user = await findById(id);
@@ -191,6 +193,19 @@ async function updateUserRoleService(id, role) {
       "id",
       "Nenhum usuário encontrado com esse ID",
     );
+  }
+
+  if (user.role === ROLES.ADMIN && role !== ROLES.ADMIN) {
+    const totalAdmins = await countAdmins();
+
+    if (totalAdmins === 1) {
+      throw createError(
+        409,
+        "Operação não permitida",
+        "role",
+        "O sistema deve possuir pelo menos um administrador.",
+      );
+    }
   }
 
   const updatedUser = await updateUserRepository(id, {

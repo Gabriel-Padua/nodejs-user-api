@@ -8,6 +8,7 @@ import {
 } from "../services/userService.js";
 
 import loginUserService from "../services/authService.js";
+import e from "express";
 
 async function createUserController(req, res) {
   try {
@@ -98,11 +99,14 @@ async function updateUserRoleController(req, res) {
   const { role } = req.body;
 
   try {
+    const currentUserId = req.user.id;
     const user = await updateUserRoleService(id, role);
     return res
       .status(200)
-      .json({ message: "Role de usuário atualizado com sucesso", user });
+      .json({ message: "Role atualizado com sucesso", user });
   } catch (error) {
+    console.log(error);
+
     return res.status(error.status ?? 500).json(error);
   }
 }

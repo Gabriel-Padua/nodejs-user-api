@@ -93,6 +93,18 @@ async function deleteUser(id) {
   return rows[0] ?? null;
 }
 
+async function countAdmins() {
+  const query = `
+  SELECT COUNT(*) AS total
+  FROM users
+  WHERE role ='admin';
+  `;
+
+  const { rows } = await pool.query(query);
+
+  return Number(rows[0].total);
+}
+
 export {
   createUser,
   findAllUsers,
@@ -100,4 +112,5 @@ export {
   findByEmail,
   updateUser,
   deleteUser,
+  countAdmins,
 };
