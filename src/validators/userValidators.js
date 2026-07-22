@@ -25,6 +25,12 @@ function validateCreateUser(data) {
     return passwordError;
   }
 
+  const emailError = emailValidator(email);
+
+  if (emailError) {
+    return emailError;
+  }
+
   const birthDateError = validateBirthDate(birth_date);
 
   if (birthDateError) {
@@ -53,9 +59,9 @@ function validateUpdateUser(data) {
   }
 
   if ("email" in data) {
-    const passwordError = emailValidator(data.email);
-    if (passwordError) {
-      return passwordError;
+    const emailError = emailValidator(data.email);
+    if (emailError) {
+      return emailError;
     }
   }
 
@@ -66,7 +72,7 @@ function validateUpdateUser(data) {
     }
   }
   if ("birth_date" in data) {
-    const birthDateError = validateBirthDate(data.email);
+    const birthDateError = validateBirthDate(data.birth_date);
     if (birthDateError) {
       return birthDateError;
     }

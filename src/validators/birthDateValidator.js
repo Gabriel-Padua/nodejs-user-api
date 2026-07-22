@@ -6,7 +6,7 @@ function validateBirthDate(birth_date) {
       400,
       "Dado inválido",
       "birth_date",
-      "Data de nascimento inválida",
+      "Data de Nascimento não é válida",
     );
   }
 
@@ -16,7 +16,7 @@ function validateBirthDate(birth_date) {
       400,
       "Dado inválido",
       "birth_date",
-      "Data de Nascimento não válida",
+      "Data de Nascimento não é válida",
     );
   }
 
