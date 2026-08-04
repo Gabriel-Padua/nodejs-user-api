@@ -1,6 +1,6 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
-import validateUUID from "../src/validators/uuidValidator.js";
+import { validateUUID } from "../../src/validators/uuidValidator.js";
 
 describe("validateUUID()", () => {
   test("Deve retornar null se o UUID for válido", () => {

@@ -4,7 +4,7 @@ import {
   validateCreateUser,
   validateLogin,
   validateUpdateUser,
-} from "../src/validators/userValidators.js";
+} from "../../src/validators/userValidators.js";
 
 const validUser = {
   name: "John Doe",

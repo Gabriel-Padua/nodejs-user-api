@@ -1,18 +1,10 @@
-import {
-  createUserService,
-  getUsersService,
-  getUserByIdService,
-  updateUserService,
-  deleteUserService,
-  updateUserRoleService,
-} from "../services/userService.js";
+import * as userService from "../services/userService.js";
 
 import loginUserService from "../services/authService.js";
-import e from "express";
 
 async function createUserController(req, res) {
   try {
-    const user = await createUserService(req.body);
+    const user = await userService.createUserService(req.body);
     return res
       .status(201)
       .json({ message: "Usuário criado com sucesso!", user });
@@ -25,7 +17,7 @@ async function updateUserController(req, res) {
   const { id } = req.params;
   const data = req.body;
   try {
-    const user = await updateUserService(id, data);
+    const user = await userService.updateUserService(id, data);
     return res
       .status(200)
       .json({ message: `Usuário atualizado com sucesso`, user });
@@ -42,7 +34,7 @@ async function getUsersController(req, res) {
   if (req.query.isActive === "true") isActiveValid = true;
   if (req.query.isActive === "false") isActiveValid = false;
   try {
-    const result = await getUsersService(limitValid, isActiveValid);
+    const result = await userService.getUsersService(limitValid, isActiveValid);
     return res.status(200).json(result);
   } catch (error) {
     return res.status(500).json(error.message);
@@ -52,7 +44,7 @@ async function getUsersController(req, res) {
 async function getUserByIdController(req, res) {
   const { id } = req.params;
   try {
-    const result = await getUserByIdService(id);
+    const result = await userService.getUserByIdService(id);
     return res.status(200).json(result);
   } catch (error) {
     return res.status(error.status ?? 500).json(error);
@@ -63,7 +55,7 @@ async function deleteUserController(req, res) {
   const { id } = req.params;
 
   try {
-    const result = await deleteUserService(id);
+    const result = await userService.deleteUserService(id);
     return res
       .status(200)
       .json({ message: "Usuário deletado com sucesso!", result });
@@ -87,7 +79,7 @@ async function loginUserController(req, res) {
 async function getMeController(req, res) {
   const { id } = req.user;
   try {
-    const user = await getUserByIdService(id);
+    const user = await userService.getUserByIdService(id);
     return res.status(200).json(user);
   } catch (error) {
     return res.status(error.status ?? 500).json(error);
@@ -99,14 +91,11 @@ async function updateUserRoleController(req, res) {
   const { role } = req.body;
 
   try {
-    const currentUserId = req.user.id;
-    const user = await updateUserRoleService(id, role);
+    const user = await userService.updateUserRoleService(id, role);
     return res
       .status(200)
       .json({ message: "Role atualizado com sucesso", user });
   } catch (error) {
-    console.log(error);
-
     return res.status(error.status ?? 500).json(error);
   }
 }

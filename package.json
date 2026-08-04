@@ -7,15 +7,24 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test"
+    "test": "node --env-file=.env.test --test-concurrency=1 --test",
+    "coverage": "node --experimental-test-coverage --env-file=.env.test --test-concurrency=1 --test",
+    "test:unit": "node --env-file=.env.test --test --test-concurrency=1 \"tests/unit/**/*.test.js\"",
+    "test:integration": "node --env-file=.env.test --test --test-concurrency=1 \"tests/integration/**/*.test.js\"",
+    "test:repositories": "node --env-file=.env.test --test --test-concurrency=1 \"tests/integration/repositories/**/*.test.js\"",
+    "test:middlewares": "node --env-file=.env.test --test --test-concurrency=1 \"tests/integration/middlewares/**/*.test.js\"",
+    "test:services": "node --env-file=.env.test --test --test-concurrency=1 \"tests/integration/services/**/*.test.js\"",
+    "test:controllers": "node --env-file=.env.test --test --test-concurrency=1 \"tests/integration/controllers/**/*.test.js\""
   },
-  "keywords": ["nodejs",
+  "keywords": [
+    "nodejs",
     "express",
     "postgresql",
     "rest-api",
     "jwt",
     "bcrypt",
-    "backend"],
+    "backend"
+  ],
   "author": "Gabriel Pádua",
   "license": "MIT",
   "dependencies": {
@@ -25,5 +34,8 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0",
     "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "c8": "^12.0.0"
   }
 }

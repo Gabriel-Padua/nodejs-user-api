@@ -1,7 +1,7 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 
-import { generateToken, verifyToken } from "../src/helpers/jwt.js";
+import { generateToken, verifyToken } from "../../src/helpers/jwt.js";
 
 process.env.JWT_SECRET = "chave_secreta_de_teste";
 

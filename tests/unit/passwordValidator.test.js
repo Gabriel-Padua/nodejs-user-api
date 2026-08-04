@@ -1,6 +1,6 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
-import passwordValidator from "../src/validators/passwordValidator.js";
+import passwordValidator from "../../src/validators/passwordValidator.js";
 
 describe("passwordValidator()", () => {
   test("Deve retornar null se a senha for enviada corretamente", () => {

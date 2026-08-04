@@ -1,4 +1,4 @@
-function toPublicUser(user) {
+export function toPublicUser(user) {
   return {
     id: user.id,
     name: user.name,
@@ -10,5 +10,3 @@ function toPublicUser(user) {
     updated_at: user.updated_at,
   };
 }
-
-export default toPublicUser;

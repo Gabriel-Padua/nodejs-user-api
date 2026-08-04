@@ -1,4 +1,4 @@
-import validateUUID from "./uuidValidator.js";
+import { validateUUID } from "./uuidValidator.js";
 import createError from "../utils/createError.js";
 import emailValidator from "./emailValidator.js";
 import validateBirthDate from "./birthDateValidator.js";

@@ -27,7 +27,7 @@ async function findById(id) {
     [id],
   );
 
-  return rows[0] || null;
+  return rows[0] ?? null;
 }
 
 async function findByEmail(email) {
@@ -38,22 +38,24 @@ async function findByEmail(email) {
     [email],
   );
 
-  return rows[0] || null;
+  return rows[0] ?? null;
 }
 
 async function createUser(data) {
   const { name, password, email, birth_date } = data;
+
   const { rows } = await pool.query(
     `
-        INSERT INTO 
-                users(name, password, email, birth_date)
-            VALUES
-                ($1,$2,$3,$4) 
-              RETURNING *
-        `,
+      INSERT INTO users
+        (name, password, email, birth_date)
+      VALUES
+        ($1, $2, $3, $4)
+      RETURNING *;
+    `,
     [name.trim(), password.trim(), email.trim(), birth_date],
   );
-  return rows[0] || null;
+
+  return rows[0];
 }
 
 async function updateUser(id, data) {

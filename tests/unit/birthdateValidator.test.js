@@ -1,6 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import validateBirthDate from "../src/validators/birthDateValidator.js";
+import validateBirthDate from "../../src/validators/birthDateValidator.js";
 
 describe("birthDateValidator()", () => {
   test("Deve retorna null se a data de nascimento enviado seja válida e tenha mais de 18 anos", () => {

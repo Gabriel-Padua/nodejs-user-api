@@ -1,6 +1,6 @@
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
-import emailValidator from "../src/validators/emailValidator.js";
+import emailValidator from "../../src/validators/emailValidator.js";
 
 describe("emailValidator()", () => {
   test("Deve retornar null se o e-mail for mandado corretamente", () => {

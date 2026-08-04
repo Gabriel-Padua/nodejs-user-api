@@ -1,40 +1,27 @@
 import "dotenv/config";
 import bcrypt from "bcrypt";
 import createError from "../utils/createError.js";
-import toPublicUser from "../utils/userMapper.js";
-import validateUUID from "../validators/uuidValidator.js";
-import {
-  validateCreateUser,
-  validateUpdateUser,
-  validateLogin,
-} from "../validators/userValidators.js";
-
-import {
-  findByEmail,
-  createUser as createUserRepository,
-  findAllUsers,
-  findById,
-  countAdmins,
-  deleteUser as deleteUserRepository,
-  updateUser as updateUserRepository,
-} from "../repositories/userRepository.js";
-import roleValidator from "../validators/roleValidator.js";
+import * as mapper from "../utils/userMapper.js";
+import * as uuidValidator from "../validators/uuidValidator.js";
+import * as userValidator from "../validators/userValidator.js";
+import * as userRepository from "../repositories/userRepository.js";
+import * as roleValidator from "../validators/roleValidator.js";
 import { ROLES } from "../constants/roles.js";
 
 async function getUsersService(limit, isActive) {
-  const users = await findAllUsers(limit, isActive);
+  const users = await userRepository.findAllUsers(limit, isActive);
 
   return users;
 }
 
 async function updateUserService(id, data = {}) {
-  const erro = validateUUID(id);
+  const erro = uuidValidator.validateUUID(id);
 
   if (erro) {
     throw erro;
   }
 
-  const user = await findById(id);
+  const user = await userRepository.findById(id);
 
   if (!user) {
     throw createError(
@@ -69,19 +56,14 @@ async function updateUserService(id, data = {}) {
       "Nenhum campo enviado para atualização",
     );
   }
-  const error = validateUpdateUser(filteredData);
+  const error = userValidator.validateUpdateUser(filteredData);
 
   if (error) {
     throw error;
   }
 
-  const mergedUser = {
-    ...user,
-    ...filteredData,
-  };
-
   if (filteredData.email && filteredData.email !== user.email) {
-    const emailExists = await findByEmail(filteredData.email);
+    const emailExists = await userRepository.findByEmail(filteredData.email);
 
     if (emailExists) {
       throw createError(
@@ -93,20 +75,18 @@ async function updateUserService(id, data = {}) {
     }
   }
 
-  const updatedUser = await updateUserRepository(id, filteredData);
+  const updatedUser = await userRepository.updateUser(id, filteredData);
 
-  delete updatedUser.password;
-
-  return updatedUser;
+  return mapper.toPublicUser(updatedUser);
 }
 
 async function getUserByIdService(id) {
-  const erro = validateUUID(id);
+  const erro = uuidValidator.validateUUID(id);
   if (erro) {
     throw erro;
   }
 
-  const user = await findById(id);
+  const user = await userRepository.findById(id);
 
   if (!user) {
     throw createError(
@@ -117,17 +97,17 @@ async function getUserByIdService(id) {
     );
   }
 
-  return toPublicUser(user);
+  return mapper.toPublicUser(user);
 }
 
 async function createUserService(data) {
-  const error = validateCreateUser(data);
+  const error = userValidator.validateCreateUser(data);
 
   if (error) {
     throw error;
   }
 
-  const user = await findByEmail(data.email);
+  const user = await userRepository.findByEmail(data.email);
 
   if (user) {
     throw createError(
@@ -141,23 +121,25 @@ async function createUserService(data) {
   const passwordHash = await bcrypt.hash(data.password, 10);
 
   const newUser = {
-    ...data,
+    name: data.name,
+    email: data.email,
     password: passwordHash,
+    birth_date: data.birth_date,
   };
 
-  const createdUser = await createUserRepository(newUser);
+  const createdUser = await userRepository.createUser(newUser);
 
-  return toPublicUser(createdUser);
+  return mapper.toPublicUser(createdUser);
 }
 
 async function deleteUserService(id) {
-  const erro = validateUUID(id);
+  const erro = uuidValidator.validateUUID(id);
 
   if (erro) {
     throw erro;
   }
 
-  const user = await getUserByIdService(id);
+  const user = await userRepository.findById(id);
 
   if (!user) {
     throw createError(
@@ -168,23 +150,23 @@ async function deleteUserService(id) {
     );
   }
 
-  const deletedUser = await deleteUserRepository(id);
+  const deletedUser = await userRepository.deleteUser(id);
 
-  return toPublicUser(deletedUser);
+  return mapper.toPublicUser(deletedUser);
 }
 
 async function updateUserRoleService(id, role) {
-  const erro = validateUUID(id);
+  const erro = uuidValidator.validateUUID(id);
   if (erro) {
     throw erro;
   }
-  const roleError = roleValidator(role);
+  const roleError = roleValidator.roleValidator(role);
 
   if (roleError) {
     throw roleError;
   }
 
-  const user = await findById(id);
+  const user = await userRepository.findById(id);
 
   if (!user) {
     throw createError(
@@ -196,7 +178,7 @@ async function updateUserRoleService(id, role) {
   }
 
   if (user.role === ROLES.ADMIN && role !== ROLES.ADMIN) {
-    const totalAdmins = await countAdmins();
+    const totalAdmins = await userRepository.countAdmins();
 
     if (totalAdmins === 1) {
       throw createError(
@@ -208,11 +190,11 @@ async function updateUserRoleService(id, role) {
     }
   }
 
-  const updatedUser = await updateUserRepository(id, {
+  const updatedUser = await userRepository.updateUser(id, {
     role,
   });
 
-  return toPublicUser(updatedUser);
+  return mapper.toPublicUser(updatedUser);
 }
 
 export {

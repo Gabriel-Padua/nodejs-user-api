@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import toPublicUser from "../utils/userMapper.js";
+import { toPublicUser } from "../utils/userMapper.js";
 import { generateToken } from "../helpers/jwt.js";
 import { validateLogin } from "../validators/userValidators.js";
 import { findByEmail } from "../repositories/userRepository.js";
