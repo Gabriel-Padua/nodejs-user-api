@@ -30,7 +30,7 @@ async function loginUserService({ email, password }) {
       401,
       "Usuário não autorizado",
       "user",
-      "Email ou senha não são compativeis",
+      "Email ou senha não são compatíveis",
     );
   }
 
